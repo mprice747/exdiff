@@ -1,11 +1,10 @@
 Package: exdiff
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Extrema Inference via Diffeomorphisms for Multimodial Probability Distributions
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Author: person("Michael", "Price", email = "mprice@tamu.edu", role = c("aut", "cre"))
+Maintainer: Michael Price <mprice@tamu.edu>
+Description: This packages offers functionalities to estimate the extrema of probability distributions. By applying a certain class of increasing, continuous functions called diffeomorphisms to a simple class of spline interpolations, any probability distribution within a specified compact interval and a given number of extrema, or nodes, can be estimated. In addition, with our formulation, the extrema can easily be inferred after the estimation procedure is complete. We offer both a maximum likelohood functionality that returns point estimates of the extrema and a Bayesian implementation via an elliptical slice sampler that outputs credible intervals for the extrema. Finally, we offer a graphical implementation that displays both the estimated probability distribution and the location of the extrema.   
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
