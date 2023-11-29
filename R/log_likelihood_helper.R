@@ -1,13 +1,10 @@
-library(pracma)
-
-
 # Constants used throughout log-likelihood calculation
 SQRT_2 <- sqrt(2)
 
 # Used for calculating normalizing constant (Trapezoid integration)
 X_FOR_INTEGRAL <- as.matrix(seq(0, 1, length.out = 2000))
 TRAPZ_INTEGRAL_FUNC <- function(func_output) {
-  return(pracma::trapz(X_FOR_INTEGRAL,func_output))
+  return(trapz(X_FOR_INTEGRAL,func_output))
 }
 
 
@@ -169,3 +166,100 @@ gamma_function <- function(X, Beta) {
   return(t(exp_map))
 
 }
+
+
+min_max_transform_X <- function(X) {
+
+  # Helper to transform X to interval in between 0 and 1 (Required for diffeomorphism)
+
+  # Input:
+  # X - vector or matrix containing data
+
+  # Output:
+  # list containing transformed X (new_X), lower_bound used in transformation and
+  # upper bound used in transformation
+
+  sd_X <- sd(X)
+  sqrt_n <- sqrt(length(X))
+
+  # Bounds are at extreme points plus or minus standard error
+  lower_bound <- min(X) - sd_X/sqrt_n
+  upper_bound <- max(X) + sd_X/sqrt_n
+
+  # Min-max scaling
+  new_X <- (X - lower_bound)/(upper_bound - lower_bound)
+
+  return(list(new_X = new_X, lower_bound = lower_bound, upper_bound = upper_bound))
+
+}
+
+
+check_fluctuating_lambda <- function(lambda_vec) {
+
+  # Check if in lambda vector lambda_{i - 1} > lambda{i} < lambda_{i + 1}
+  # when i is odd (lambda_vec length 5 or higher)
+
+  check_fluctuating <- seq(from = 3, to = length(lambda_vec) - 2, by = 2)
+  for (valley in check_fluctuating) {
+    if ((lambda_vec[valley] >= lambda_vec[valley - 1]) | (lambda_vec[valley] >= lambda_vec[valley + 1])  ){
+      stop('At least one lambda in lambda_vec misspecified! (not lambda_{i - 1} > lambda{i} < lambda_{i + 1}) ')
+    }
+  }
+}
+
+
+check_compat_log_lik <- function(Beta, b_vec, lambda_vec){
+
+  # Check compatibility of all parameters of log-likelihood function
+
+  # Both b_vec and lambda_vec must have the same, odd length
+  if (length(b_vec) != length(lambda_vec)) {
+    stop('b_vec and lambda_vec do not have the same length!')
+  }
+
+  if ((length(b_vec) %% 2) == 0 ){
+    stop('b_vec and lambda_vec must have odd number length!')
+  }
+
+  # b_vec must be sorted and have its first element equal to 0 and last equal to 1
+  if ((b_vec[1] != 0) | (b_vec[length(b_vec)] != 1)){
+    stop('b_vec\'s first and last elements must equal 0 and 1 respectively!')
+  }
+  if (is.unsorted(b_vec)){
+    stop('b_vec is unsorted!')
+  }
+
+  # lambda_vec's first and last elements equal to 0
+  if ((lambda_vec[1] != 0) | (lambda_vec[length(lambda_vec)] != 0)) {
+    stop('lambda_vec\'s first and last elements must equal 0')
+  }
+
+  # lambda_vec's second element must equal 1
+  if ((lambda_vec[2] != 1)) {
+    stop('lambda_vec\'s second element must equal 1')
+  }
+
+  # Check if lambda_vec is "fluctuating" if length greater than 3
+  if (length(lambda_vec > 3)) {
+    check_fluctuating_lambda(lambda_vec)
+  }
+
+  # Check if any beta norm is greater than pi^2. If so, remove from calculation
+  beta_norms <- rowSums(Beta^2)
+  incompat_beta <- which(beta_norms >= pi^2)
+
+  if (length(incompat_beta) == length(beta_norms)) {
+    stop('Norms of all supplied weight vectors > pi! Stopping log likelihood calculation')
+  }
+  if (length(incompat_beta) > 0){
+    print('Subset of weight vectors have norm > pi! Removing them from log likelihood calculation')
+    new_Beta <- Beta[-incompat_beta, ]
+    return(new_Beta)
+  }
+
+  return(Beta)
+}
+
+
+
+
