@@ -34,8 +34,8 @@ diffeo_log_likelihood <- function(X, Beta, b_vec, lambda_vec,
   }
 
   # Transform X
-  if ((transform_X) | (min(X) < 0) | (max(X) > 0)) {
-    X <- min_max_transform_X(X)
+  if ((transform_X) | (min(X) < 0) | (max(X) > 1)) {
+    X <- min_max_transform_X(X)$new_X
   }
 
 
@@ -49,6 +49,11 @@ diffeo_log_likelihood <- function(X, Beta, b_vec, lambda_vec,
   if (check_compat) {
     Beta <- check_compat_log_lik(Beta, b_vec, lambda_vec)
   }
+
+  if (abs(sum(Beta)) <= 1e-6){
+    Beta <- Beta + matrix(runif(ncol(Beta), -0.001, 0.001), nrow = 1)
+  }
+
 
   # Apply gamma function to X and Beta and correct for floating point error
   apply_gamma <- gamma_function(X, Beta)
@@ -82,3 +87,97 @@ diffeo_log_likelihood <- function(X, Beta, b_vec, lambda_vec,
   return(list(diffeomorphism = apply_gamma, log_like = log_like))
 
 }
+
+
+for_optimization_diffeo <- function(betas, input_X) {
+
+  Beta <- matrix(betas, nrow = 1)
+
+  log_like_full <- diffeo_log_likelihood(input_X, Beta, b_vec = c(0, 0.5, 1),
+                                         lambda_vec = c(0, 1, 0),
+                                         interpolation = 'cubic',
+                                         transform_X = FALSE,
+                                         check_compat = FALSE)
+  return(-1 * sum(log_like_full$log_like))
+
+}
+
+
+hin1 <- function(x) {
+  norms <- sum(x^2) - pi^2
+  return(norms)
+}
+
+bayes_log_like <- function(betas, Y) {
+
+  if (sum(betas^2) > pi^2) {
+    return(-Inf)
+  }
+
+  Beta <- matrix(betas, nrow = 1)
+
+  log_like_full <- diffeo_log_likelihood(input_X, Beta, b_vec = c(0, 0.5, 1),
+                                         lambda_vec = c(0, 1, 0),
+                                         interpolation = 'cubic',
+                                         transform_X = FALSE,
+                                         check_compat = FALSE)
+  return(-1 * sum(log_like_full$log_like))
+}
+
+shit <- ess(bayes_log_like, input_X, Sig = 0.75 * diag(3), N_mcmc = 1000,
+    burn_in = 1000, N = 3, FALSE)
+
+
+plot(1:1000, shit[, 3], type = 'l')
+
+
+global_optimize <- function(X, num_betas, num_trials = 25) {
+
+  X <- rnorm(50)
+  num_betas <- 3
+  num_trials <- 25
+
+  transformed_X <- min_max_transform_X(X)
+  input_X <- transformed_X$new_X
+
+  hist(input_X, breaks = 20)
+
+  beta_bound <- pi/sqrt(num_betas)
+
+  beta_starts <- matrix(runif(num_trials * num_betas, -beta_bound, beta_bound),
+                        ncol = num_betas)
+
+  fmin_value <- Inf
+
+  for (j in 1:num_trials) {
+
+    trial_point <- beta_starts[j, ]
+
+    min_result <- fmincon(trial_point, for_optimization_diffeo, input_X = input_X,
+                     method = 'SQP', A = NULL, b = NULL, Aeq = NULL,
+                     beq = NULL, lb = NULL, ub = NULL, hin = hin1, heq = NULL,
+                     tol = 1e-06, maxfeval = 10000, maxiter = 5000)
+
+    if (min_result$value < fmin_value) {
+      fmin_value <- min_result$value
+      final_beta <- min_result$par
+    }
+  }
+
+  X_test <- seq(0, 1, length.out = 2500)
+  help <- diffeo_log_likelihood(X_test,
+                                shit[950, ], b_vec = c(0, 0.5, 1),
+                                lambda_vec = c(0, 1, 0),
+                                interpolation = 'cubic',
+                                transform_X = FALSE,
+                                check_compat = FALSE)
+
+  plot(X_test, exp(help$log_like), type = 'l')
+
+  interp1(as.vector(help$diffeomorphism), X_test, 0.5)
+
+
+}
+
+
+

@@ -240,7 +240,7 @@ check_compat_log_lik <- function(Beta, b_vec, lambda_vec){
   }
 
   # Check if lambda_vec is "fluctuating" if length greater than 3
-  if (length(lambda_vec > 3)) {
+  if (length(lambda_vec) > 3) {
     check_fluctuating_lambda(lambda_vec)
   }
 
@@ -259,7 +259,5 @@ check_compat_log_lik <- function(Beta, b_vec, lambda_vec){
 
   return(Beta)
 }
-
-
 
 
