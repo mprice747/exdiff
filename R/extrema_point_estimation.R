@@ -93,6 +93,10 @@ for_optimization_diffeo <- function(betas, input_X) {
 
   Beta <- matrix(betas, nrow = 1)
 
+  if (sum(Beta^2) >(pi^2) + 1e-05) {
+    return(Inf)
+  }
+
   log_like_full <- diffeo_log_likelihood(input_X, Beta, b_vec = c(0, 0.5, 1),
                                          lambda_vec = c(0, 1, 0),
                                          interpolation = 'cubic',
@@ -108,37 +112,64 @@ hin1 <- function(x) {
   return(norms)
 }
 
-bayes_log_like <- function(betas, Y) {
+find_extrema <- function()
 
-  if (sum(betas^2) > pi^2) {
-    return(-Inf)
+mh_adaptive_sampling_betas <- function(input_X, initial_guess, num_samples = 5000,
+                                       burn_in = 1000, prop_var = 0.5) {
+
+
+  p <- length(initial_guess)
+
+  function_for_mcmc <- function(betas) {
+    return(-1 * for_optimization_diffeo(betas, input_X))
   }
 
-  Beta <- matrix(betas, nrow = 1)
+  initial_scale <- rep(prop_var, p)
 
-  log_like_full <- diffeo_log_likelihood(input_X, Beta, b_vec = c(0, 0.5, 1),
-                                         lambda_vec = c(0, 1, 0),
-                                         interpolation = 'cubic',
-                                         transform_X = FALSE,
-                                         check_compat = FALSE)
-  return(-1 * sum(log_like_full$log_like))
+  adaptive_MCMC <- MCMC(p = function_for_mcmc, init = initial_guess,
+                n = num_samples + burn_in, scale = initial_scale, adapt = TRUE,
+       acc.rate = 0.3)
+
+  final_betas <- adaptive_MCMC$samples[(burn_in + 1):(num_samples + burn_in), ]
+  bayes_avg_betas <- colMeans(final_betas)
+
+  X_sample <- seq(0, 1, length.out = 500)
+
+  all_likelihoods <- diffeo_log_likelihood(X_sample, final_betas, b_vec = c(0, 0.5, 1),
+                                           lambda_vec = c(0, 1, 0),
+                                           interpolation = 'cubic',
+                                           transform_X = FALSE,
+                                           check_compat = FALSE)
+
+  sampled_x_extrema <- apply(all_likelihoods$diffeomorphism, 2,
+                             interp1, y = X_sample, xi = 0.5)
+
+
+  bayes_avg_likelihood <- diffeo_log_likelihood(X_sample, bayes_avg_betas,
+                                                b_vec = c(0, 0.5, 1),
+                                                lambda_vec = c(0, 1, 0),
+                                                interpolation = 'cubic',
+                                                transform_X = FALSE,
+                                                check_compat = FALSE)
+
+  bayes_avg_extrema <- interp1(as.vector(bayes_avg_likelihood$diffeomorphism),
+                               X_sample, 0.5)
+
+
+
+
+
 }
-
-shit <- ess(bayes_log_like, input_X, Sig = 0.75 * diag(3), N_mcmc = 1000,
-    burn_in = 1000, N = 3, FALSE)
-
-
-plot(1:1000, shit[, 3], type = 'l')
 
 
 global_optimize <- function(X, num_betas, num_trials = 25) {
 
-  X <- rnorm(50)
+  X <- rgamma(25, 1, 1)
   num_betas <- 3
   num_trials <- 25
 
   transformed_X <- min_max_transform_X(X)
-  input_X <- transformed_X$new_X
+  input_X <- abs(transformed_X$new_X -1)
 
   hist(input_X, breaks = 20)
 
@@ -164,9 +195,9 @@ global_optimize <- function(X, num_betas, num_trials = 25) {
     }
   }
 
-  X_test <- seq(0, 1, length.out = 2500)
+  X_test <- seq(0, 1, length.out = 1000)
   help <- diffeo_log_likelihood(X_test,
-                                shit[950, ], b_vec = c(0, 0.5, 1),
+                                final_beta, b_vec = c(0, 0.5, 1),
                                 lambda_vec = c(0, 1, 0),
                                 interpolation = 'cubic',
                                 transform_X = FALSE,
@@ -179,5 +210,11 @@ global_optimize <- function(X, num_betas, num_trials = 25) {
 
 }
 
+
+tryCatch(expr = {y = stop('oh no')}, error = {error=function(e) {
+  message('An Error Occurred')
+}})
+
+print('yes')
 
 
