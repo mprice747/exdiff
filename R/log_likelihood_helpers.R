@@ -1,3 +1,5 @@
+# Helpers to calculate diffeomorphism log_likelihood
+
 # Constants used throughout log-likelihood calculation
 SQRT_2 <- sqrt(2)
 
