@@ -122,19 +122,28 @@ global_optimize <- function(input_X, num_betas, optimize_type,
   }
 
   if(optimize_type == 'map') {
+
+    if(is.null(prior_sd)) {
+      stop('prior_sd can not be null if using map estimate!')
+    }
+
     prior_sd_vec <- rep(prior_sd, num_betas)
     prior_mean_vec <- rep(0, num_betas)
 
-    map_optimization <- function(betas) {
+    map_optimization <- function(betas, input_X) {
       return( mle_optimization(betas, input_X) - sum(dnorm(betas,
             mean = prior_mean_vec, sd = prior_sd_vec, log = TRUE) ))
     }
-    func_to_minimize <- map_optimization
-  }
-  else{
-    func_to_minimize <- mle_optimization
-  }
 
+    func_to_minimize <- map_optimization
+
+  } else if (optimize_type == 'mle') {
+
+    func_to_minimize <- mle_optimization
+
+  } else{
+    stop('optimize_type must be mle or map!')
+  }
 
   fmin_value <- Inf
 
@@ -153,7 +162,6 @@ global_optimize <- function(input_X, num_betas, optimize_type,
                     sep = ''))
     })
 
-
     if (min_result$value < fmin_value) {
       fmin_value <- min_result$value
       final_beta <- min_result$par
@@ -165,15 +173,14 @@ global_optimize <- function(input_X, num_betas, optimize_type,
 
 }
 
-mode_estimation_plot <- function(X, p_X, pdf, mode_estimate) {
+mode_estimation_plot <- function(X, p_X, pdf, mode_estimate, plot_title) {
 
   where_mode <- mode_estimate/max(p_X)
 
   if (where_mode <= 0.5){
     annotate_x <- Inf
     annotate_hjust <- 1
-  }
-  else {
+  } else {
     annotate_x <- -Inf
     annotate_hjust <- 0
   }
@@ -185,7 +192,7 @@ mode_estimation_plot <- function(X, p_X, pdf, mode_estimate) {
              panel.grid.minor = element_blank()) + geom_line(aes(p_X, pdf),
             size = 1.5) + geom_segment(aes(x = mode_estimate, y = 0, xend = mode_estimate,
             yend = mode_pdf), color = "red", size=1.5) + annotate("label", x = annotate_x, y = Inf, label = paste("Mode =", round(mode_estimate, 3)),
-           hjust = annotate_hjust, vjust = 1, size = 5.5) + xlab('Input Data') + ylab('Density Estimation') + ggtitle('Mode Estimation Density Plot')
+           hjust = annotate_hjust, vjust = 1, size = 5.5) + xlab('Input Data') + ylab('Density Estimation') + ggtitle(plot_title)
 
   return(plot_mle)
 }
@@ -196,7 +203,8 @@ diffeo_mle_estimate <- function(X, num_betas, num_trials = 25, beta_starts = NUL
   transformed_X <- min_max_transform_X(X)
   input_X <- transformed_X$new_X
 
-  final_beta <- global_optimize(input_X, num_betas, 'mle', num_trials, beta_starts)
+  final_beta <- global_optimize(input_X, num_betas, 'mle',
+                                num_trials, beta_starts)
 
   fit_likelihood <- diffeo_log_likelihood(X_SAMPLE,
                                 final_beta, b_vec = c(0, 0.5, 1),
@@ -218,7 +226,8 @@ diffeo_mle_estimate <- function(X, num_betas, num_trials = 25, beta_starts = NUL
   pdf <- as.vector(pdf_unnormalized/trapz(p_X, pdf_unnormalized))
 
   if (plot_results) {
-    mle_plot <- mode_estimation_plot(X, p_X, pdf, mode_estimate)
+    mle_plot <- mode_estimation_plot(X, p_X, pdf, mode_estimate,
+                                     'Mode Estimation Density Plot (MLE)')
     plot(mle_plot)
   }
 
@@ -227,7 +236,7 @@ diffeo_mle_estimate <- function(X, num_betas, num_trials = 25, beta_starts = NUL
 }
 
 
-mh_adaptive_sampling_betas <- function(input_X, initial_guess, num_samples = 5000,
+mh_adaptive_sampling_betas <- function(input_X, map_estimate, num_samples = 5000,
                                        burn_in = 1000, prior_sd = 0.75,
                                        prop_sd = 0.5) {
 
@@ -238,18 +247,16 @@ mh_adaptive_sampling_betas <- function(input_X, initial_guess, num_samples = 500
 
   function_for_mcmc <- function(betas) {
     return(-1 * mle_optimization(betas, input_X) + sum(dnorm(betas,
-                                                             mean = prior_mean_vec, sd = prior_sd_vec, log = TRUE) ))
+    mean = prior_mean_vec, sd = prior_sd_vec, log = TRUE) ))
   }
-
 
   initial_scale <- rep(prop_sd, p)
 
-  adaptive_MCMC <- MCMC(p = function_for_mcmc, init = initial_guess,
+  adaptive_MCMC <- MCMC(p = function_for_mcmc, init = map_estimate,
                         n = num_samples + burn_in, scale = initial_scale, adapt = TRUE,
                         acc.rate = 0.3)
 
   sampled_betas <- adaptive_MCMC$samples[(burn_in + 1):(num_samples + burn_in), ]
-  bayes_avg_betas <- colMeans(sampled_betas)
 
   all_likelihoods <- diffeo_log_likelihood(X_SAMPLE, sampled_betas, b_vec = c(0, 0.5, 1),
                                            lambda_vec = c(0, 1, 0),
@@ -261,24 +268,24 @@ mh_adaptive_sampling_betas <- function(input_X, initial_guess, num_samples = 500
                              interp1, y = X_SAMPLE, xi = 0.5)
 
 
-  bayes_avg_results <- diffeo_log_likelihood(X_SAMPLE, bayes_avg_betas,
+  bayes_map_results <- diffeo_log_likelihood(X_SAMPLE, map_estimate,
                                                 b_vec = c(0, 0.5, 1),
                                                 lambda_vec = c(0, 1, 0),
                                                 interpolation = 'cubic',
                                                 transform_X = FALSE,
                                                 check_compat = FALSE)
 
-  bayes_avg_mode <- interp1(as.vector(bayes_avg_results$diffeomorphism),
+  bayes_map_mode <- interp1(as.vector(bayes_map_results$diffeomorphism),
                                X_SAMPLE, 0.5)
 
   return(list(sampled_betas = sampled_betas, sampled_modes = sampled_modes,
-              bayes_avg_mode = bayes_avg_mode,
-              bayes_avg_likelihood = as.vector(exp(bayes_avg_results$log_like))))
+              bayes_map_mode = bayes_map_mode,
+              bayes_map_likelihood = as.vector(exp(bayes_map_results$log_like))))
 }
 
 diffeo_bayes_plot <- function(X, p_X, pdf, mode_estimate, sampled_modes) {
 
-  plot_1 <- mode_estimation_plot(X, p_X, pdf, mode_estimate)
+  plot_1 <- mode_estimation_plot(X, p_X, pdf, mode_estimate, 'Mode Estimation Density (MAP)')
 
   plot_2 <- ggplot() + geom_histogram(aes(sampled_modes, after_stat(density)), colour = 1, fill = 'white',
            bins =20) + theme(panel.grid.major = element_blank(),
@@ -296,12 +303,12 @@ diffeo_bayes_estimates <- function(X, num_betas, num_samples = 5000,
 
 
   print('Starting Initial Guess Search (MAP)')
-  initial_guess <- global_optimize(input_X, num_betas, 'map', 25, NULL, prior_sd)
+  map_estimate <- global_optimize(input_X, num_betas, 'map', 25, NULL, prior_sd)
   print('Finished Initial Guess Search (MAP)')
 
 
   print('Starting Adaptive MCMC Sampler')
-  bayes_estimates_0_1 <- mh_adaptive_sampling_betas(input_X, initial_guess,num_samples,
+  bayes_estimates_0_1 <- mh_adaptive_sampling_betas(input_X, map_estimate, num_samples,
                              burn_in, prior_sd, prop_sd)
   print('Finished Adaptive MCMC Sampler')
 
@@ -309,19 +316,19 @@ diffeo_bayes_estimates <- function(X, num_betas, num_samples = 5000,
 
   sampled_betas <- bayes_estimates_0_1$sampled_betas
   sampled_modes <- bayes_estimates_0_1$sampled_modes * range_X + transformed_X$lower_bound
-  bayes_avg_mode <- bayes_estimates_0_1$bayes_avg_mode * range_X + transformed_X$lower_bound
+  bayes_map_mode <- bayes_estimates_0_1$bayes_map_mode * range_X + transformed_X$lower_bound
 
   p_X <- X_SAMPLE * range_X + transformed_X$lower_bound
-  pdf_unnormalized <- exp(bayes_estimates_0_1$bayes_avg_likelihood)
+  pdf_unnormalized <- exp(bayes_estimates_0_1$bayes_map_likelihood)
   bayes_pdf <- as.vector(pdf_unnormalized/trapz(p_X, pdf_unnormalized))
 
   if (plot_results) {
-    bayes_plot <- diffeo_bayes_plot(X, p_X, bayes_pdf, bayes_avg_mode, sampled_modes)
+    bayes_plot <- diffeo_bayes_plot(X, p_X, bayes_pdf, bayes_map_mode, sampled_modes)
     plot(bayes_plot)
   }
 
   return(list(sampled_betas = sampled_betas, sampled_modes = sampled_modes,
-              bayes_avg_mode = bayes_avg_mode, p_X = p_X,
+              bayes_avg_mode = bayes_map_mode, p_X = p_X,
               bayes_pdf = bayes_pdf))
 }
 
@@ -336,17 +343,11 @@ input_X <- min_max_transform_X(X)$new_X
 
 hist(input_X)
 
-initial_guess <- global_optimize(input_X, 3, 25)
+initial_guess <- global_optimize(input_X, 3, "mle", 25)
 mle_estimate <- diffeo_mle_estimate(X, 3)
 
 
 bayes_estimators <- diffeo_bayes_estimates(X, 3)
-
-mean(bayes_estimators$bayes_avg_mode)
-
-
-plot(bayes_estimators$p_X, bayes_estimators$bayes_pdf, type = 'l')
-
 
 
 
