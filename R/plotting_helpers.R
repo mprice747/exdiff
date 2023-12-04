@@ -6,6 +6,7 @@
 #' @param pdf numeric vector; pdf output with p_X as input
 #' @param mode_estimate real number; estimated mode, to be displayed on top left or top right corner
 #' @param plot_title string; title of plot
+#' @noRd
 mode_estimation_plot <- function(X, p_X, pdf, mode_estimate, plot_title) {
 
   # Whether mode should be displayed on top left or top right
@@ -38,9 +39,8 @@ mode_estimation_plot <- function(X, p_X, pdf, mode_estimate, plot_title) {
 #' @param pdf numeric vector; pdf output with p_X as input
 #' @param mode_estimate real number; estimated mode, to be displayed on top left or top right corner
 #' @param sampled_modes numeric vector; contains sampled modes from Bayesian MCMC
+#' @noRd
 diffeo_bayes_plot <- function(X, p_X, pdf, mode_estimate, sampled_modes) {
-
-  #
 
   # Mode estimation plot
   plot_1 <- mode_estimation_plot(X, p_X, pdf, mode_estimate, 'Mode Estimation Density (MAP)')

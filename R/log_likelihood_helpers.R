@@ -1,14 +1,17 @@
 # Helpers to calculate diffeomorphism log_likelihood
 
 #' SQRT(2) constant
+#' @noRd
 SQRT_2 <- sqrt(2)
 
 #' Used for calculating normalizing constant (Trapezoid integration)
+#' @noRd
 X_FOR_INTEGRAL <- as.matrix(seq(0, 1, length.out = 2000))
 
 #' Calculating integral from 0 to 1 of function via trapezoid integral
 #' @param func function to integrate
 #' @returns integral result
+#' @noRd
 TRAPZ_INTEGRAL_FUNC <- function(func) {
   return(trapz(X_FOR_INTEGRAL,func))
 }
@@ -17,6 +20,7 @@ TRAPZ_INTEGRAL_FUNC <- function(func) {
 #' Check if input is matrix. If not, turn into 1 column matrix
 #' @param X array like
 #' @returns matrix form of X (nx1)
+#' @noRd
 check_matrix <- function(X) {
 
   if (!is.matrix(X)) {
@@ -29,6 +33,7 @@ check_matrix <- function(X) {
 #' Check if input is matrix. If not, turn into 1 row matrix
 #' @param X array like
 #' @returns matrix form of X (1xn)
+#' @noRd
 turn_1d_into_matrix <- function(X) {
 
   if (is.null(dim(X))) {
@@ -42,6 +47,7 @@ turn_1d_into_matrix <- function(X) {
 #' @param X nx1 Matrix of observations
 #' @param Beta mxj Matrix of different beta vectors (weight parameters)
 #' @returns nxm Matrix of representing the n observations evaluated at m different cosine bases
+#' @noRd
 cosine_basis <- function(X, Beta) {
 
   Cos_Mat <- cos(pi * (X %*% matrix(seq(1, ncol(Beta)), nrow = 1)))
@@ -55,6 +61,7 @@ cosine_basis <- function(X, Beta) {
 #' @param X nx1 Matrix of observations description
 #' @param Beta mxj Matrix of different beta vectors (weight parameters)
 #' @returns nxm Matrix of representing the integral of 0 to X of cosine basis with different weight parameters
+#' @noRd
 int_cosine_basis <- function(X, Beta) {
 
   j_vec <- seq(1, ncol(Beta))
@@ -70,6 +77,7 @@ int_cosine_basis <- function(X, Beta) {
 #' @param x number, upper bound
 #' @param j positive integer
 #' @returns integral result
+#' @noRd
 cos_2_integral <- function(x, j) {
 
   two_pi_j <- 2 * pi * j
@@ -83,6 +91,7 @@ cos_2_integral <- function(x, j) {
 #' @param j1 positive integer
 #' @param j2 positive integer, different from j1
 #' @returns integral result
+#' @noRd
 cos_cos_integral <- function(x, j1, j2){
 
   pi_j1_j2 <- pi * (j1 + j2)
@@ -97,6 +106,7 @@ cos_cos_integral <- function(x, j1, j2){
 #' Given vector, output 2 x choose(length(vec), 2) containing every combination of elements within vec
 #' @param vec 1-d vector
 #' @returns vec containing every possible product of two numbers
+#' @noRd
 different_beta_product <- function(vec) {
 
   vec_comb <- combn(vec, 2)
@@ -108,6 +118,7 @@ different_beta_product <- function(vec) {
 #' @param X nx1 Matrix of observations
 #' @param Beta mxj Matrix of different beta vectors (weight parameters)
 #' @returns nxm Matrix of representing the integral of 0 to X of cosine basis squared with different weight parameters
+#' @noRd
 int_cosine_basis_2 <- function(X, Beta) {
 
   # Produce every possible pair of position
@@ -135,6 +146,7 @@ int_cosine_basis_2 <- function(X, Beta) {
 #' @param X nx1 Matrix of observations
 #' @param Beta  mxj Matrix of different beta vectors (weight parameters)
 #' @returns nxm Matrix of representing the results of the gamma function defined in the paper (int_{0}^{X} exponential_map(t)^2 dt)
+#' @noRd
 gamma_function <- function(X, Beta) {
 
 
@@ -162,6 +174,7 @@ gamma_function <- function(X, Beta) {
 #' Helper to transform X to interval in between 0 and 1 (Required for diffeomorphism)
 #' @param X vector or matrix containing data
 #' @returns list containing transformed X (new_X), lower_bound used in transformation and upper bound used in transformation
+#' @noRd
 min_max_transform_X <- function(X) {
 
 
@@ -181,6 +194,7 @@ min_max_transform_X <- function(X) {
 
 #' Check if in lambda vector lambda_{i - 1} > lambda{i} < lambda_{i + 1} when i is odd (lambda_vec length 5 or higher)
 #' @param lambda_vec vector of positive numbers
+#' @noRd
 check_fluctuating_lambda <- function(lambda_vec) {
 
   check_fluctuating <- seq(from = 3, to = length(lambda_vec) - 2, by = 2)
@@ -196,6 +210,7 @@ check_fluctuating_lambda <- function(lambda_vec) {
 #' @param b_vec Numeric vector; input points to interpolation; must be in order, first element equal to 0 and second element equal to 1.
 #' @param lambda_vec Numeric vector; output points to interpolation; must have lambda_vec[i] > lambda_vec[i] < lambda_vec[i + 1].
 #' @returns modified beta matrix in case some needed to be removed
+#' @noRd
 check_compat_log_lik <- function(Beta, b_vec, lambda_vec){
 
 
