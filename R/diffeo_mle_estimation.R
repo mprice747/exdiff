@@ -30,7 +30,8 @@ diffeo_mle_estimate <- function(X, num_betas, num_trials = 25, beta_starts = NUL
   transformed_X <- min_max_transform_X(X)
   input_X <- transformed_X$new_X
 
-  final_beta <- global_optimize(input_X, num_betas, 'mle',
+  opt_type <- 'mle'
+  final_beta <- global_optimize(input_X, num_betas, opt_type,
                                 num_trials, beta_starts)
 
   # Uses estimates to calculate pdf

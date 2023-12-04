@@ -41,8 +41,9 @@ diffeo_bayes_estimate <- function(X, num_betas, num_trials = 25, beta_starts = N
   transformed_X <- min_max_transform_X(X)
   input_X <- transformed_X$new_X
 
+  opt_type <- 'map'
   print('Starting Initial Guess Search (MAP)')
-  map_estimate <- global_optimize(input_X, num_betas, 'map', num_trials,
+  map_estimate <- global_optimize(input_X, num_betas, opt_type, num_trials,
                                   beta_starts, prior_sd)
   print('Finished Initial Guess Search (MAP)')
 
