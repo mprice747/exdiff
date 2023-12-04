@@ -10,13 +10,13 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.3
 Imports:
+    adaptMCMC,
+    ggplot2,
+    grDevices,
+    gridExtra,
+    NlcOptim,
     pracma,
-    adaptMCMC, 
-    NlcOptim, 
-    ggplot2, 
-    gridExtra, 
-    grDevices, 
-    stats, 
+    stats,
     utils
 Suggests: 
     testthat (>= 3.0.0)
