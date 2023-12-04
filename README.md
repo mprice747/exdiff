@@ -31,7 +31,7 @@ X1 <- rgamma(100, 2, 1)
 mle_X1 <- diffeo_mle_estimate(X1, num_betas = 2, plot_results = TRUE)
 ```
 
-![]()![](images/mle_plot.png){width="469"}
+![]()![](images/mle_plot.png)
 
 To obtain Bayesian samples of the mode, and thus perform uncertainty quantification, one must call the **diffeo_bayes_estimate** function. Here, the posterior is estimated via the adaptive MCMC procedure from the **adaptMCMC** package. The user will also receive point estimates via a MAP estimation procedure. Again, the main hyperparameter is num_betas, but the user also has options to tweak the prior distribution and MCMC sampler.
 
@@ -39,7 +39,7 @@ To obtain Bayesian samples of the mode, and thus perform uncertainty quantificat
 bayes_X1 <- diffeo_bayes_estimate(X1, 2, num_samples = 5000, prior_sd = 0.75, plot_results = TRUE)
 ```
 
-![](images/map_plot.png){width="469"}
+![](images/map_plot.png)
 
 The user can also explore the likelihood function used for estimate with the **diffeo_log_likelihood** function. For more details about this likelihood, see paper linked above.
 
