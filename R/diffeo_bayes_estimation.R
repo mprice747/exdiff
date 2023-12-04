@@ -2,22 +2,35 @@
 #'
 #' Obtain MAP estimates of pdf and posterior distribution of modes by calculating posterior with adapative MCMC
 #'
-#' @param X Numeric vector; represents data vector
+#' @param X Numeric vector; represents data vector.
 #' @param num_betas positive integer > 1; length of weight vector, also number of basis elements for cosine basis of diffeomorphism.
+#' @param num_trials positive integer; number of random starting points, and thus trials, for MAP optimization procedure.
+#' @param beta_starts NULL or n x num_betas matrix; represents user chosen starting points for MAP. If NULL num_trials random beta vectors chosen.
 #' @param num_samples positive integer; number of samples to return from MCMC.
 #' @param burn_in positive integer; burn_in number for MCMC.
-#' @param prior_sd positive real; prior is no covariance multivariate normal, represents standard deviation for each component
-#' @param prop_sd positive real; proposal distribution standard deviation for adaptive MCMC
+#' @param prior_sd positive real; prior is no covariance multivariate normal, represents standard deviation for each component.
+#' @param prop_sd positive real; proposal distribution standard deviation for adaptive MCMC.
 #' @returns List containing following components: \item{sampled_betas}{MCMC posterior sampled weight vectors} \item{sampled_modes}{MCMC posterior sampled modes} \item{bayes_map_beta}{MAP estimate of beta vector} \item{bayes_map_mode}{MAP estimate of mode} \item{p_X}{the input used for pdf estimation} \item{bayes_map_pdf}{MAP estimate of the pdf}
 #' @export
 #' @examples
 #' # Sample from gamma(2, 1). Mode should be around 1
 #' # X <- rgamma(50, 2, 1)
 #' # bayes_estimate <- diffeo_bayes_estimate(X, num_betas = 3, num_samples = 5000, prior_sd = 0.75)
-diffeo_bayes_estimate <- function(X, num_betas, num_samples = 5000,
-                                   burn_in = 1000, prior_sd = 0.75,
+diffeo_bayes_estimate <- function(X, num_betas, num_trials = 25, beta_starts = NULL,
+                                  num_samples = 5000, burn_in = 1000, prior_sd = 0.75,
                                    prop_sd = 0.5, plot_results = TRUE) {
 
+  # num_betas need to be greater than or equal to 2
+  check_integer_2(num_betas, 'num_betas')
+
+  # Following need to be positive integers
+  check_pos_integer(num_trials, 'num_trials')
+  check_pos_integer(num_samples, 'num_samples')
+  check_pos_integer(burn_in, 'burn_in')
+
+  # Following need to be positive numbers
+  check_pos_number(prior_sd, 'prior_sd')
+  check_pos_number(prop_sd, 'prop_sd')
 
 
   # Transform X to [0, 1] and obtain MAP estimates
@@ -25,7 +38,8 @@ diffeo_bayes_estimate <- function(X, num_betas, num_samples = 5000,
   input_X <- transformed_X$new_X
 
   print('Starting Initial Guess Search (MAP)')
-  map_estimate <- global_optimize(input_X, num_betas, 'map', 25, NULL, prior_sd)
+  map_estimate <- global_optimize(input_X, num_betas, 'map', num_trials,
+                                  beta_starts, prior_sd)
   print('Finished Initial Guess Search (MAP)')
 
 

@@ -7,6 +7,8 @@
 diffeo_bayes_estimate(
   X,
   num_betas,
+  num_trials = 25,
+  beta_starts = NULL,
   num_samples = 5000,
   burn_in = 1000,
   prior_sd = 0.75,
@@ -15,17 +17,21 @@ diffeo_bayes_estimate(
 )
 }
 \arguments{
-\item{X}{Numeric vector; represents data vector}
+\item{X}{Numeric vector; represents data vector.}
 
 \item{num_betas}{positive integer > 1; length of weight vector, also number of basis elements for cosine basis of diffeomorphism.}
+
+\item{num_trials}{positive integer; number of random starting points, and thus trials, for MAP optimization procedure.}
+
+\item{beta_starts}{NULL or n x num_betas matrix; represents user chosen starting points for MAP. If NULL num_trials random beta vectors chosen.}
 
 \item{num_samples}{positive integer; number of samples to return from MCMC.}
 
 \item{burn_in}{positive integer; burn_in number for MCMC.}
 
-\item{prior_sd}{positive real; prior is no covariance multivariate normal, represents standard deviation for each component}
+\item{prior_sd}{positive real; prior is no covariance multivariate normal, represents standard deviation for each component.}
 
-\item{prop_sd}{positive real; proposal distribution standard deviation for adaptive MCMC}
+\item{prop_sd}{positive real; proposal distribution standard deviation for adaptive MCMC.}
 }
 \value{
 List containing following components: \item{sampled_betas}{MCMC posterior sampled weight vectors} \item{sampled_modes}{MCMC posterior sampled modes} \item{bayes_map_beta}{MAP estimate of beta vector} \item{bayes_map_mode}{MAP estimate of mode} \item{p_X}{the input used for pdf estimation} \item{bayes_map_pdf}{MAP estimate of the pdf}

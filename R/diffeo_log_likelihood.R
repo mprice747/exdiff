@@ -2,13 +2,13 @@
 #'
 #' Calculates log-likelihood and diffeomorphism map for a set of points
 #'
-#' @param X Numeric vector or nx1 matrix; represents data vector
+#' @param X Numeric vector or nx1 matrix; represents data vector.
 #' @param Beta Numeric vector or mxp matrix; represents m different weight vectors for length p cosine basis; must have Euclidean norm less than pi.
 #' @param b_vec Numeric vector; input points to interpolation; must be in order, first element equal to 0 and second element equal to 1.
-#' @param lambda_vec Numeric vector; output points to interpolation; must have lambda_vec[i] > lambda_vec[i] < lambda_vec[i + 1]
-#' @param interpolation 'cubic' or 'linear'; the interpolation method to use to fit b_vec & lambda_vec
-#' @param transform_X boolean; whether to transform X into values in between 0 and 1 using min-max scaling; will do so automatically if min(X) < 0 or max(X) > 1
-#' @param check_compat boolean; whether to perform process to check compatibility of given parameters
+#' @param lambda_vec Numeric vector; output points to interpolation; must have lambda_vec[i] > lambda_vec[i] < lambda_vec[i + 1].
+#' @param interpolation 'cubic' or 'linear'; the interpolation method to use to fit b_vec & lambda_vec.
+#' @param transform_X boolean; whether to transform X into values in between 0 and 1 using min-max scaling; will do so automatically if min(X) < 0 or max(X) > 1.
+#' @param check_compat boolean; whether to perform process to check compatibility of given parameters.
 #' @returns List with following components: \item{diffeomorphism}{nxm matrix containing output after applying differomorphism to X for each beta weight vector} \item{log_like}{nxm matrix containing output after applying log-likelihood to X for each beta weight vector}
 #' @export
 #' @examples
@@ -22,7 +22,7 @@ diffeo_log_likelihood <- function(X, Beta, b_vec, lambda_vec,
                                   interpolation = 'cubic', transform_X = TRUE,
                                   check_compat = TRUE) {
 
-  # Turn X and Beta into matrices
+  # Turn X into  matrix
   if (is.vector(X)){
     X <- as.matrix(X)
   }

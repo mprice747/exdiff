@@ -16,6 +16,12 @@
 diffeo_mle_estimate <- function(X, num_betas, num_trials = 25, beta_starts = NULL,
                                 plot_results = TRUE) {
 
+  # num_betas need to be greater than or equal to 2
+  check_integer_2(num_betas, 'num_betas')
+
+  # num_trials need to be positive integer
+  check_pos_integer(num_trials, 'num_trials')
+
   # Transform X to [0, 1] and obtain beta estimates
   transformed_X <- min_max_transform_X(X)
   input_X <- transformed_X$new_X

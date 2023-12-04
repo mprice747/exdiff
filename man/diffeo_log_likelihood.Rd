@@ -15,19 +15,19 @@ diffeo_log_likelihood(
 )
 }
 \arguments{
-\item{X}{Numeric vector or nx1 matrix; represents data vector}
+\item{X}{Numeric vector or nx1 matrix; represents data vector.}
 
 \item{Beta}{Numeric vector or mxp matrix; represents m different weight vectors for length p cosine basis; must have Euclidean norm less than pi.}
 
 \item{b_vec}{Numeric vector; input points to interpolation; must be in order, first element equal to 0 and second element equal to 1.}
 
-\item{lambda_vec}{Numeric vector; output points to interpolation; must have lambda_vec[i] > lambda_vec[i] < lambda_vec[i + 1]}
+\item{lambda_vec}{Numeric vector; output points to interpolation; must have lambda_vec[i] > lambda_vec[i] < lambda_vec[i + 1].}
 
-\item{interpolation}{'cubic' or 'linear'; the interpolation method to use to fit b_vec & lambda_vec}
+\item{interpolation}{'cubic' or 'linear'; the interpolation method to use to fit b_vec & lambda_vec.}
 
-\item{transform_X}{boolean; whether to transform X into values in between 0 and 1 using min-max scaling; will do so automatically if min(X) < 0 or max(X) > 1}
+\item{transform_X}{boolean; whether to transform X into values in between 0 and 1 using min-max scaling; will do so automatically if min(X) < 0 or max(X) > 1.}
 
-\item{check_compat}{boolean; whether to perform process to check compatibility of given parameters}
+\item{check_compat}{boolean; whether to perform process to check compatibility of given parameters.}
 }
 \value{
 List with following components: \item{diffeomorphism}{nxm matrix containing output after applying differomorphism to X for each beta weight vector} \item{log_like}{nxm matrix containing output after applying log-likelihood to X for each beta weight vector}

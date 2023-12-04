@@ -11,6 +11,3 @@ library(exdiff)
 
 test_check("exdiff")
 
-testthat::test_file("tests/testthat/test-log_likelihood_helpers.R")
-testthat::test_file("tests/testthat/test-diffeo_log_likelihood.R")
-

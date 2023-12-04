@@ -40,6 +40,27 @@ hin1 <- function(x) {
   return(norms)
 }
 
+# Check if positive number
+check_pos_number <- function(x, name) {
+  if (x <= 0){
+    stop(paste(name, 'needs to be a positive number!'))
+  }
+}
+
+# Check if positive integer
+check_pos_integer <- function(x, name){
+  if ((x < 1) | (x%%1 != 0) ){
+    stop(paste(name, 'needs to be a positive integer!'))
+  }
+}
+
+# Check if positive integer greater than or equal to 2
+check_integer_2 <- function(x, name){
+  if ((x < 2) | (x%%1 != 0) ){
+    stop(paste(name, 'needs to be an integer greater than 2!'))
+  }
+}
+
 global_optimize <- function(input_X, num_betas, optimize_type,
                             num_trials = 25, beta_starts = NULL, prior_sd = NULL) {
 
