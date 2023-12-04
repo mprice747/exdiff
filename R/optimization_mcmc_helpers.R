@@ -1,19 +1,13 @@
 # Helpers for MLE optimization and MCMC sampler
 
-# Constant used for plotting likelihood functions anf getting mode estimates
+#' Constant used for plotting likelihood functions anf getting mode estimates
 X_SAMPLE <- seq(0, 1, length.out = 1000)
 
-
+#' Given beta (weight) vector and dataset with values in between 0 and 1, calculate negative joint log likelihood (Only one mode).
+#' @param betas numeric vector; represents weight vector for cosine basis
+#' @param input_X  numeric vector; represents data for log likelihood. Points must be in between 0 and 1
+#' @returns negative log likelihood
 mle_optimization <- function(betas, input_X) {
-
-  # Given beta (weight) vector and dataset with values in between 0 and 1,
-  # calculate negative joint log likelihood (Only one mode).
-  # Function used to optimize the mle
-
-  # Inputs:
-  # betas - numeric vector; represents weight vector for cosine basis
-  # input_X - numeric vector; represents data for log likelihood. Points must be
-  # in between 0 and 1
 
 
   Beta <- matrix(betas, nrow = 1)
@@ -34,53 +28,50 @@ mle_optimization <- function(betas, input_X) {
 }
 
 
-# Function used for fmincon. Makes sure norm of betas < pi
+#' Function used for fmincon. Makes sure norm of betas < pi
+#' @param x vector
+#' @returns difference of Euclidean norm^2 and pi^2
 hin1 <- function(x) {
   norms <- sum(x^2) - pi^2
   return(norms)
 }
 
-# Check if positive number
+#' Check if positive number
+#' @param x number to check
+#' @param name variable name of number to check
 check_pos_number <- function(x, name) {
   if (x <= 0){
     stop(paste(name, 'needs to be a positive number!'))
   }
 }
 
-# Check if positive integer
+#' Check if positive integer
+#' @param x number to check
+#' @param name variable name of number to check
 check_pos_integer <- function(x, name){
   if ((x < 1) | (x%%1 != 0) ){
     stop(paste(name, 'needs to be a positive integer!'))
   }
 }
 
-# Check if positive integer greater than or equal to 2
+#' Check if positive integer greater than or equal to 2
+#' @param x number to check
+#' @param name variable name of number to check
 check_integer_2 <- function(x, name){
   if ((x < 2) | (x%%1 != 0) ){
     stop(paste(name, 'needs to be an integer greater than 2!'))
   }
 }
-
+#' Given dataset, find optimal beta vector that maximizes MLE or MAP (Only assumes one mode, so designed to find most extreme mode in probability distribution) Uses fmincon with multiple starting points and picks
+#' @param input_X numeric vector; represents data for log likelihood. Points must be in between 0 and 1
+#' @param num_betas positive integer; length of weight vector, also number of basis elements for cosine basis of diffeomorphism
+#' @param optimize_type either 'mle' or 'map', whether to find mle or map estimate
+#' @param num_trials positive integer; number of random starting points for fmincon
+#' @param beta_starts - NULL or n x num_betas matrix; represents user chosen starting points. If NULL num_trials random beta vectors chosen
+#' @param prior_sd positive real or NULL; Represents prior distribution standard deviation for MAP
+#' @returns numeric vector representing fmincon's estimate of the argmin should be
 global_optimize <- function(input_X, num_betas, optimize_type,
                             num_trials = 25, beta_starts = NULL, prior_sd = NULL) {
-
-  # Given dataset, find optimal beta vector that maximizes MLE or MAP (Only assumes one mode,
-  # so designed to find most extreme mode in probability distribution)
-  # Uses fmincon with multiple starting points and picks
-
-  # Inputs:
-  # input_X - numeric vector; represents data for log likelihood. Points must be
-  # in between 0 and 1
-  # num_betas - positive integer; length of weight vector, also number of basis elements for
-  # cosine basis of diffeomorphism
-  # optimize_type - either 'mle' or 'map', whether to find mle or map estimate
-  # num_trials - positive integer; number of random starting points for fmincon
-  # beta_starts - NULL or n x num_betas matrix; represents user chosen starting points. If
-  # NULL num_trials random beta vectors chosen
-  # prior_sd - positive real; Represents prior distribution standard deviation for MAP
-
-  # Outputs:
-  # numeric vector representing fmincon's estimate of the argmin should be
 
   # If beta_starts is null generate random starting points
   if (is.null(beta_starts)) {
@@ -154,28 +145,19 @@ global_optimize <- function(input_X, num_betas, optimize_type,
 
 }
 
+#' For Bayesian estimation, runs adaptive MCMC to get posterior distribution of beta_vectors
+#' @param input_X numeric vector; represents data for log likelihood. Points must be in between 0 and 1
+#' @param map_estimate NULL numeric vector; MAP estimate which is starting point for MCMC
+#' @param num_samples positive integer; number of samples to return from MCMC
+#' @param burn_in positive integer; burn_in number for MCMC
+#' @param prior_sd positive real; prior is no covariance multivariate normal, represents standard deviation for each component
+#' @param prop_sd positive real; proposal distribution standard deviation for adaptive MCMC
+#' @returns list containing sampled beta vectors (sampled_betas), sampled modes calculated from the sampled beta vectors (sampled_modes), MAP estimate of the mode (bayes_map_mode), and MAP estimate of the pdf using X_SAMPLE as input (bayes_map_pdf)
 mh_adaptive_sampling_betas <- function(input_X, map_estimate, num_samples = 5000,
                                        burn_in = 1000, prior_sd = 0.75,
                                        prop_sd = 0.5) {
 
-  # For Bayesian estimation, runs adaptive MCMC to get posterior distribution of beta_vectors
-
-  # Inputs:
-  # input_X - numeric vector; represents data for log likelihood. Points must be
-  # in between 0 and 1
-  # map_estimate - NULL numeric vector; MAP estimate which is starting point for MCMC
-  # num_samples - positive integer; number of samples to return from MCMC
-  # burn_in - positive integer; burn_in number for MCMC
-  # prior_sd - positive real; prior is no covariance multivariate normal, represents
-  # standard deviation for each component
-  # prop_sd - positive real; proposal distribution standard deviation for adaptive MCMC
-
-  # Output:
-  # list containing sampled beta vectors (sampled_betas), sampled modes calculated from the
-  # sampled beta vectors (sampled_modes), MAP estimate of the mode (bayes_map_mode),
-  # and MAP estimate of the pdf using X_SAMPLE as input (bayes_map_pdf)
-
-  # Initialize posterior log-likelihood for MCMC
+  # Intialize vectors for MCMC function
   p <- length(map_estimate)
   prior_sd_vec <- rep(prior_sd, p)
   prior_mean_vec <- rep(0, p)

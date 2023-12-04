@@ -10,4 +10,3 @@ library(testthat)
 library(exdiff)
 
 test_check("exdiff")
-

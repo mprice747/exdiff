@@ -32,6 +32,8 @@ diffeo_bayes_estimate(
 \item{prior_sd}{positive real; prior is no covariance multivariate normal, represents standard deviation for each component.}
 
 \item{prop_sd}{positive real; proposal distribution standard deviation for adaptive MCMC.}
+
+\item{plot_results}{boolean; whether to display plot which shows histogram of original data, the pdf estimate and the mode estimate.}
 }
 \value{
 List containing following components: \item{sampled_betas}{MCMC posterior sampled weight vectors} \item{sampled_modes}{MCMC posterior sampled modes} \item{bayes_map_beta}{MAP estimate of beta vector} \item{bayes_map_mode}{MAP estimate of mode} \item{p_X}{the input used for pdf estimation} \item{bayes_map_pdf}{MAP estimate of the pdf}

@@ -1,15 +1,12 @@
 # Helpers for plotting functionalities
 
+#' Displays histogram of original data, pdf estimate and mode estimate
+#' @param X numeric vector; original data
+#' @param p_X numeric vector; data used for pdf estimation
+#' @param pdf numeric vector; pdf output with p_X as input
+#' @param mode_estimate real number; estimated mode, to be displayed on top left or top right corner
+#' @param plot_title string; title of plot
 mode_estimation_plot <- function(X, p_X, pdf, mode_estimate, plot_title) {
-
-  # Displays histogram of original data, pdf estimate and mode estimate
-
-  # Inputs:
-  # X - numeric vector; original data
-  # p_X - numeric vector; data used for pdf estimation
-  # pdf - numeric vector; pdf output with p_X as input
-  # mode_estimate - real number; estimate mode, to be displayed on top left or top right corner
-  # plot_title - string; title of plot
 
   # Whether mode should be displayed on top left or top right
   where_mode <- mode_estimate/max(p_X)
@@ -35,10 +32,15 @@ mode_estimation_plot <- function(X, p_X, pdf, mode_estimate, plot_title) {
   return(estimate_plot)
 }
 
+#' Plot for bayesian analysis of modes. Displays mode estimation plot with MAP estimates on top and histogram of MCMC sampled modes on bottom
+#' @param X numeric vector; original data
+#' @param p_X numeric vector; data used for pdf estimation
+#' @param pdf numeric vector; pdf output with p_X as input
+#' @param mode_estimate real number; estimated mode, to be displayed on top left or top right corner
+#' @param sampled_modes numeric vector; contains sampled modes from Bayesian MCMC
 diffeo_bayes_plot <- function(X, p_X, pdf, mode_estimate, sampled_modes) {
 
-  # Plot for bayesian analysis of modes. Displays mode estimation plot with MAP estimates on top
-  # and histogram of MCMC sampled modes on bottom
+  #
 
   # Mode estimation plot
   plot_1 <- mode_estimation_plot(X, p_X, pdf, mode_estimate, 'Mode Estimation Density (MAP)')

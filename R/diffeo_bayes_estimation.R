@@ -10,6 +10,7 @@
 #' @param burn_in positive integer; burn_in number for MCMC.
 #' @param prior_sd positive real; prior is no covariance multivariate normal, represents standard deviation for each component.
 #' @param prop_sd positive real; proposal distribution standard deviation for adaptive MCMC.
+#' @param plot_results boolean; whether to display plot which shows histogram of original data, the pdf estimate and the mode estimate.
 #' @returns List containing following components: \item{sampled_betas}{MCMC posterior sampled weight vectors} \item{sampled_modes}{MCMC posterior sampled modes} \item{bayes_map_beta}{MAP estimate of beta vector} \item{bayes_map_mode}{MAP estimate of mode} \item{p_X}{the input used for pdf estimation} \item{bayes_map_pdf}{MAP estimate of the pdf}
 #' @export
 #' @examples
