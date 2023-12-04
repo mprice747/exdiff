@@ -1,4 +1,3 @@
-
 # Make Sure Diffeomorphism produces transform from [0, 1] to [0, 1] and still increasing
 X <- as.matrix(seq(0, 1, length.out = 100))
 Beta_1 <- matrix(c(0.5, -0.5, 0.43), nrow = 1)

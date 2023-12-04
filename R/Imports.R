@@ -5,4 +5,3 @@
 #' @import NlcOptim
 #' @import ggplot2
 #' @importFrom gridExtra grid.arrange
-NULL

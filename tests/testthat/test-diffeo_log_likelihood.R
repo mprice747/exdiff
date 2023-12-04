@@ -1,4 +1,3 @@
-library(pracma)
 # Test the diffeo log likelihood function
 X <- as.matrix(seq(0.01, 0.99, length.out = 2000))
 

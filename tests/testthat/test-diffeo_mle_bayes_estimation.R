@@ -1,7 +1,3 @@
-# Test if MLE and Bayes produces proper estimates
-library(pracma)
-library(adaptMCMC)
-
 # Initialize Data
 set.seed(42)
 X1 <- rnorm(75)

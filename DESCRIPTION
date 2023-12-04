@@ -9,6 +9,15 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.3
+Imports:
+    pracma,
+    adaptMCMC, 
+    NlcOptim, 
+    ggplot2, 
+    gridExtra, 
+    grDevices, 
+    stats, 
+    utils
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
