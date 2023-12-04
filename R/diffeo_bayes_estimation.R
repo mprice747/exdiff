@@ -23,6 +23,10 @@ diffeo_bayes_estimate <- function(X, num_betas, num_trials = 25, beta_starts = N
   # num_betas need to be greater than or equal to 2
   check_integer_2(num_betas, 'num_betas')
 
+  if (length(X) < num_betas){
+    stop('num_betas must be less than the number of data points!')
+  }
+
   # Following need to be positive integers
   check_pos_integer(num_trials, 'num_trials')
   check_pos_integer(num_samples, 'num_samples')
