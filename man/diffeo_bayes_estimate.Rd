@@ -17,7 +17,7 @@ diffeo_bayes_estimate(
 \arguments{
 \item{X}{Numeric vector; represents data vector}
 
-\item{num_betas}{positive integer; length of weight vector, also number of basis elements for cosine basis of diffeomorphism.}
+\item{num_betas}{positive integer > 1; length of weight vector, also number of basis elements for cosine basis of diffeomorphism.}
 
 \item{num_samples}{positive integer; number of samples to return from MCMC.}
 

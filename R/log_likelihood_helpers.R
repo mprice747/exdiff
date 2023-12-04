@@ -246,15 +246,19 @@ check_compat_log_lik <- function(Beta, b_vec, lambda_vec){
     check_fluctuating_lambda(lambda_vec)
   }
 
+  if(ncol(Beta) == 1){
+    stop('Beta vectors must have bigger length than 1!')
+  }
+
   # Check if any beta norm is greater than pi^2. If so, remove from calculation
   beta_norms <- rowSums(Beta^2)
-  incompat_beta <- which(beta_norms >= pi^2)
+  incompat_beta <- which((beta_norms >= pi^2) | (beta_norms <= 1e-6))
 
   if (length(incompat_beta) == length(beta_norms)) {
-    stop('Norms of all supplied weight vectors > pi! Stopping log likelihood calculation')
+    stop('Norms of all supplied weight vectors > pi or near 0! Stopping log likelihood calculation')
   }
   if (length(incompat_beta) > 0){
-    print('Subset of weight vectors have norm > pi! Removing them from log likelihood calculation')
+    print('Subset of weight vectors have norm > pi or near 0! Removing them from log likelihood calculation')
     new_Beta <- Beta[-incompat_beta, ]
     return(new_Beta)
   }

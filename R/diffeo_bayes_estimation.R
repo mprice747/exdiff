@@ -18,6 +18,8 @@ diffeo_bayes_estimate <- function(X, num_betas, num_samples = 5000,
                                    burn_in = 1000, prior_sd = 0.75,
                                    prop_sd = 0.5, plot_results = TRUE) {
 
+
+
   # Transform X to [0, 1] and obtain MAP estimates
   transformed_X <- min_max_transform_X(X)
   input_X <- transformed_X$new_X

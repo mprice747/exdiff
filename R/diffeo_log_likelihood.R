@@ -49,11 +49,6 @@ diffeo_log_likelihood <- function(X, Beta, b_vec, lambda_vec,
     Beta <- check_compat_log_lik(Beta, b_vec, lambda_vec)
   }
 
-  if (abs(sum(Beta)) <= 1e-6){
-    Beta <- Beta + matrix(runif(ncol(Beta), -0.001, 0.001), nrow = 1)
-  }
-
-
   # Apply gamma function to X and Beta and correct for floating point error
   apply_gamma <- gamma_function(X, Beta)
   apply_gamma[apply_gamma <= 0] <- 0

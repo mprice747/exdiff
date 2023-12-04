@@ -15,7 +15,7 @@ diffeo_mle_estimate(
 \arguments{
 \item{X}{Numeric vector; represents data vector}
 
-\item{num_betas}{positive integer; length of weight vector, also number of basis elements for cosine basis of diffeomorphism.}
+\item{num_betas}{positive integer > 1; length of weight vector, also number of basis elements for cosine basis of diffeomorphism.}
 
 \item{num_trials}{positive integer; number of random starting points, and thus trials, for optimization procedure.}
 
