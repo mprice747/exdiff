@@ -11,5 +11,6 @@
 #' @importFrom gridExtra grid.arrange
 #' @import stats
 #' @import utils
+#' @import grDevices
 ## usethis namespace: end
 NULL
