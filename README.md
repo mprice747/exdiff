@@ -4,7 +4,13 @@
 
 Extrema points, more specifically modes, are useful summary statistics for probability distributions, especially those that are heavily skewed or concentrated around a specific point. This package offers functionalities to infer the mode of continuous, unimodal distributions. We offer functions that obtain a point estimate via an MLE procedure and allow the user to perform uncertainty quantification of the mode via Bayesian posterior inference.
 
-To estimate the mode, we utilize a procedure introduced by Dasgupta et al. (2021) (paper linked [here](https://www.tandfonline.com/doi/full/10.1080/00401706.2020.1867647)). Here, they prove that every unimodal probability distribution within a compact interval that has 0 density on the boundaries can be estimated by applying a continuous increasing function called a diffeomorphism to the input space of another probability distribution that satisfies the same constraints. This diffeomorphism can be estimated by applying a special mapping to a truncated cosine basis  $\sum_{i = j}^{k}\sqrt{2} \beta{j}\text{cos}(\pi j x)$  In this package, we first estimate the pdf by finding a proper diffeomorphism, and thus the beta weights of best fit, to apply to a probability distribution obtained by [cubic interpolation](https://en.wikipedia.org/wiki/Cubic_Hermite_spline#Interpolation_on_a_single_interval) with mode at the center of the range. Then, the mode can be inferred by applying the inverse diffeomorphism to that center.
+To estimate the mode, we utilize a procedure introduced by Dasgupta et al. (2021) (paper linked [here](https://www.tandfonline.com/doi/full/10.1080/00401706.2020.1867647)). Here, they prove that every unimodal probability distribution within a compact interval that has 0 density on the boundaries can be estimated by applying a continuous increasing function called a diffeomorphism to the input space of another probability distribution that satisfies the same constraints. This diffeomorphism can be estimated by applying a special mapping to a truncated cosine basis
+
+``` math
+\sum_{i = j}^{k}\sqrt{2} \beta{j}\text{cos}(\pi j x)
+```
+
+In this package, we first estimate the pdf by finding a proper diffeomorphism, and thus the beta weights of best fit, to apply to a probability distribution obtained by [cubic interpolation](https://en.wikipedia.org/wiki/Cubic_Hermite_spline#Interpolation_on_a_single_interval) with mode at the center of the range. Then, the mode can be inferred by applying the inverse diffeomorphism to that center.
 
 ## Installation
 
