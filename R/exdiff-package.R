@@ -9,5 +9,6 @@
 #' @import NlcOptim
 #' @import ggplot2
 #' @importFrom gridExtra grid.arrange
+#' @import stats
 ## usethis namespace: end
 NULL

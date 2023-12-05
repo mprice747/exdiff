@@ -31,6 +31,6 @@ Obtain points estimates of pdf and mode by calculating MLE of diffeomorphism log
 }
 \examples{
 # Sample from gamma(2, 1). Mode should be around 1
-# X <- rgamma(50, 2, 1)
-# mle_estimate <- diffeo_mle_estimate(X, num_betas = 3, num_trials = 25, plot_results = TRUE)
+X <- rgamma(50, 2, 1)
+mle_estimate <- diffeo_mle_estimate(X, num_betas = 3, num_trials = 25, plot_results = TRUE)
 }
