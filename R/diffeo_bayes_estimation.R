@@ -15,8 +15,8 @@
 #' @export
 #' @examples
 #' # Sample from gamma(2, 1). Mode should be around 1
-#' # X <- rgamma(50, 2, 1)
-#' # bayes_estimate <- diffeo_bayes_estimate(X, num_betas = 3, num_samples = 5000, prior_sd = 0.75)
+#' X <- rgamma(50, 2, 1)
+#' bayes_estimate <- diffeo_bayes_estimate(X, num_betas = 3, num_samples = 5000, prior_sd = 0.75)
 diffeo_bayes_estimate <- function(X, num_betas, num_trials = 25, beta_starts = NULL,
                                   num_samples = 5000, burn_in = 1000, prior_sd = 0.75,
                                    prop_sd = 0.5, plot_results = TRUE) {
