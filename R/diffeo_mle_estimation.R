@@ -63,5 +63,5 @@ diffeo_mle_estimate <- function(X, num_betas, num_trials = 25, beta_starts = NUL
   }
 
   return(list(final_beta = final_beta, mode_estimate = mode_estimate,
-              p_X = p_X, mle_pdf = pdf))
+              p_X = p_X, mle_pdf = mle_pdf))
 }
