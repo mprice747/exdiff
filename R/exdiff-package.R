@@ -10,5 +10,6 @@
 #' @import ggplot2
 #' @importFrom gridExtra grid.arrange
 #' @import stats
+#' @import utils
 ## usethis namespace: end
 NULL
